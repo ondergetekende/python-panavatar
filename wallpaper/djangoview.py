@@ -13,9 +13,10 @@ from . import get_svg
 #         djangoviews.generate_image_svg),
 #
 
+
 def never_modified(request, width, height, seed=None):
     if seed:
-        # Seeds have all been defined in Y2K (arbirary)
+        # Fixed seeds have all been defined in Y2K (arbirary)
         return datetime.datetime(2000, 1, 1, 0, 0)
 
     # random seeds change all the time

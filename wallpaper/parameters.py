@@ -1,13 +1,9 @@
 import zlib
-import os
 import math
-import random
-import struct
 import time
-import functools
 
 
-MAX_VALUE = 0xFFFFFFFF
+MAX_VALUE = 0x3FFFFFFF  # Ignore first two bits - they are insufficienly random
 INV_MAX_VALUE = 1.0 / MAX_VALUE
 
 
@@ -19,21 +15,22 @@ class RandomParameters:
     sequence elsewhere."""
 
     def __init__(self, seed):
-        if seed:
-            if hasattr(seed, "encode"):
-                seed = seed.encode('ascii')
+        if not seed:
+            seed = "%.1f" % time.time()
 
-            # A note on hashfunctions. 
-            # We don't need cryptographic quality, so we won't use haslib - that'd
-            # be way to slow. The zlib module contains two hash functions. Adler32
-            # is fast, but not very uniform for short strings. Crc32 is a tad
-            # slower, but has better bit distribution.
-            # So, we use crc32 whenever the hash is converted into an exportable
-            # number, but we use adler32 when we're producing intermediate
-            # values.
-            self.seed = zlib.adler32(seed)
-        else:
-            self.seed = int(time.time()) * 10
+        if hasattr(seed, "encode"):
+            seed = seed.encode('ascii')
+
+        # A note on hashfunctions.
+        # We don't need cryptographic quality, so we won't use hashlib -
+        # that'd be way to slow. The zlib module contains two hash
+        # functions. Adler32 is fast, but not very uniform for short
+        # strings. Crc32 is slower, but has better bit distribution.
+        # So, we use crc32 whenever the hash is converted into an
+        # exportable number, but we use adler32 when we're producing
+        # intermediate values.
+        self.seed = zlib.adler32(seed)
+        self.text_seed = seed
 
         # Default, typically overridden
         self.size = 1024 + 786j
@@ -50,39 +47,45 @@ class RandomParameters:
                             self.img_scale * .05,
                             self.img_scale * .2)
 
-    def random(self, key):
+    def _random(self, key):
         """Generates a pseudorandom value between 0 and 1 (inclusive)"""
 
         if hasattr(key, "encode"):
-            key  = key.encode('ascii')
+            key = key.encode('ascii')
 
-        value = (zlib.crc32(key, self.seed) & 0xFFFFFFFF)
+        value = (zlib.crc32(key, self.seed) & MAX_VALUE)
 
         return value * INV_MAX_VALUE
 
+    def random(self, key):
+        return self._random(key)
+
     def uniform(self, key, min_value=0., max_value=1.):
         """Returns a random number between min_value and max_value"""
-        return min_value + self.random(key) * (max_value - min_value)
+        return min_value + self._random(key) * (max_value - min_value)
 
-    def complex(self, key):
-        """Returns a complex number. Both real and imaginary component 
-        are between 0 and 1 (inclusive)"""
+    # def complex(self, key):
+    #     """Returns a random complex number.
 
-        if hasattr(key, "encode"):
-            key.encode('ascii')
+    #     Both real and imaginary component are between 0 and 1 (inclusive)"""
 
-        value1 = zlib.crc32(seed, self.seed)  & 0xFFFFFFFF
-        value2 = zlib.crc32(seed, value2) & 0xFFFFFFFF
+    #     if hasattr(key, "encode"):
+    #         key.encode('ascii')
 
-        return (float(value1) + 1j * float(value2)) * INV_MAX_VALUE
+    #     value1 = zlib.crc32(key, self.seed) & MAX_VALUE
+    #     value2 = zlib.crc32(key, value1) & MAX_VALUE
+
+    #     return (float(value1) + 1j * float(value2)) * INV_MAX_VALUE
 
     def weighted_choice(self, probabilities, key):
-        """Makes a weighted choice between several options. probabilities is 
-        a list of 2-tuples, (probability, option). The probabilties don't need
-        to add up to anything, they are automatically scaled."""
+        """Makes a weighted choice between several options.
+
+        Probabilities is a list of 2-tuples, (probability, option). The
+        probabilties don't need to add up to anything, they are automatically
+        scaled."""
 
         total = sum(x[0] for x in probabilities)
-        choice = total * self.random(key)
+        choice = total * self._random(key)
 
         for probability, option in probabilities:
             choice -= probability
@@ -100,28 +103,39 @@ class RandomParameters:
         return PerlinNoise(value, **kwargs)
 
 
+def wrap_float(name):
+    def wrapped(self, key, *args, **kwargs):
+        try:
+            return float(self.values[key])
+        except ValueError:
+            pass  # Override was provided, but wasn't a float.
+        except KeyError:
+            pass  # Override was not provided
+
+        parent = super(OverridableParameters, self)
+        result = getattr(parent, name)(key, *args, **kwargs)
+        self.results[key] = result
+        return result
+
+    return wrapped
+
+
 class OverridableParameters(RandomParameters):
 
     def __init__(self, seed, overrides):
         super().__init__(seed)
         self.values = overrides
+        self.results = dict()
 
-    def random(self, key):
-        try:
-            return float(self.values[key])
-        except ValueError:
-            # Override was provided, but wasn't a float.
-            pass
-        except KeyError:
-            # Override was not provided
-            pass
-
-        return super().random(key)
+    result = wrap_float("result")
+    uniform = wrap_float("uniform")
 
     def weighted_choice(self, probabilities, key):
-        """Makes a weighted choice between several options. probabilities is 
-        a list of 2-tuples, (probability, option). The probabilities don't need
-        to add up to anything, they are automatically scaled."""
+        """Makes a weighted choice between several options.
+
+        Probabilities is a list of 2-tuples, (probability, option). The
+        probabilties don't need to add up to anything, they are automatically
+        scaled."""
 
         try:
             choice = self.values[key].lower()
@@ -143,7 +157,7 @@ class OverridableParameters(RandomParameters):
 
 
 class PerlinNoise():
-    def __init__(self, seed, octaves=3, min_value=0, max_value=1, size=1.0):
+    def __init__(self, seed, octaves=4, min_value=0, max_value=1, size=1.0):
         self.seed = seed
         self.scales = [.5 ** o for o in range(octaves)]
         self.min_value = min_value
@@ -164,25 +178,27 @@ class PerlinNoise():
         value = zlib.adler32(b"x", self.seed * x + y)
         value = zlib.crc32(b"x", value + octave + 1023 * x + y)
 
-        value = value & 0xFFFFFFFF
+        value = value & MAX_VALUE
         return value * INV_MAX_VALUE
 
-
     def _get_octave(self, coord, octave):
-        cellx = math.floor(coord.real)
-        celly = math.floor(coord.imag)
+        x = coord.real + 1000
+        y = coord.imag
 
-        value00 = self.random(cellx    , celly,     octave)
-        value10 = self.random(cellx + 1, celly,     octave)
-        value01 = self.random(cellx    , celly + 1, octave)
+        cellx = math.floor(x)
+        celly = math.floor(y)
+
+        value00 = self.random(cellx, celly, octave)
+        value10 = self.random(cellx + 1, celly, octave)
+        value01 = self.random(cellx, celly + 1, octave)
         value11 = self.random(cellx + 1, celly + 1, octave)
 
-        offsetx = coord.real % 1.0
-        offsety = coord.imag % 1.0
+        offsetx = x % 1.0
+        offsety = y % 1.0
 
-        value0 = offsetx * value10 + (1-offsetx) * value00
-        value1 = offsetx * value11 + (1-offsetx) * value01
+        value0 = offsetx * value10 + (1 - offsetx) * value00
+        value1 = offsetx * value11 + (1 - offsetx) * value01
 
-        result = offsety * value1 + (1-offsety) * value0
+        result = offsety * value1 + (1 - offsety) * value0
 
-        return result * self.max_value + (1-result) * self.min_value
+        return result * self.max_value + (1 - result) * self.min_value

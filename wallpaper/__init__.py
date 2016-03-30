@@ -14,7 +14,6 @@ def get_svg_iter(width, height, params={}):
 
     params.size = width + 1j * height
 
-
     yield '<svg xmlns="http://www.w3.org/2000/svg" width="%i" height="%i">' % (width, height)
 
     colormap = color_scheme.get_color_scheme(params)
@@ -38,25 +37,27 @@ def get_svg_iter(width, height, params={}):
 
     yield '</svg>'
 
+
 def get_svg(width, height, params={}):
     return "".join(get_svg_iter(width, height, params))
 
+
 def cmdline():
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Generate an svg walpaper')
     parser.add_argument('--width', type=int, default=1024,
                         help='The width of the wallpaper')
     parser.add_argument('--height', type=int, default=786,
                         help='The height of the wallpaper')
-    parser.add_argument('--seed', 
-                       help='Seed for the randomizer')
+    parser.add_argument('--seed',
+                        help='Seed for the randomizer')
 
     parser.add_argument('--output', type=argparse.FileType('w'),
                         default='-')
 
     args = parser.parse_args()
 
-    for element in get_svg_iter(args.width, args.height, 
+    for element in get_svg_iter(args.width, args.height,
                                 {"seed": args.seed}):
         args.output.write(element)
