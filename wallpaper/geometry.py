@@ -5,8 +5,8 @@ from . import patterns
 
 def get_geometry(params):
     deformations = []
-    if params.random('should_offset') > .3:
-        deformations.append(deform_noise(params))
+    if params.random('have_crumple') > .3:
+        deformations.append(deform_crumple(params))
 
     if params.random('have_wave') > .5:
         deformations.append(deform_wave(params))
@@ -27,22 +27,21 @@ def get_geometry(params):
         return patterns.get_tiles(params)
 
 
-def deform_noise(params):
-    min_offset = .2 * abs(params.size)
-    max_offset = .6 * abs(params.size)
+def deform_crumple(params):
+    max_offset = -.3 * abs(params.size)
 
-    size = .5 * abs(params.size)
-
-    avg_offset = (min_offset + max_offset) * (0.5 + 0.5j)
-    noise_x = params.perlin("noise_x", size=size,
-                            min_value=min_offset, max_value=max_offset)
-    noise_y = params.perlin("noise_y", size=size,
-                            min_value=min_offset, max_value=max_offset)
+    noise_x = params.perlin("noise_x",
+                            size=.8 * params.size.real,
+                            min_value=-max_offset,
+                            max_value=max_offset)
+    noise_y = params.perlin("noise_y",
+                            size=.8 * params.size.imag,
+                            min_value=-max_offset,
+                            max_value=max_offset)
 
     return lambda coord: (coord +
                           noise_x(coord) +
-                          noise_y(coord) * 1J -
-                          avg_offset)
+                          noise_y(coord) * 1J)
 
 
 def deform_wave(params):
