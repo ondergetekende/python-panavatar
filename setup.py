@@ -7,12 +7,12 @@ try:
     ext_modules = cythonize("wallpaper/_natives.pyx")
 except ImportError:
     ext_modules = [
-        Extension("wallpaper._natives", ["wallpaper._natives.c"]),
+        Extension("wallpaper._natives", ["wallpaper/_natives.c"]),
     ]
 
 setup(
     name='python-wallpaper',
-    version='0.2.5',
+    version='0.2.6',
     url='https://github.com/ondergetekende/python-wallpaper',
     description=(
         'python-wallpaper generates pseudorandom abstract wallpapers'
