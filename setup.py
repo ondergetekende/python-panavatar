@@ -1,9 +1,14 @@
 from setuptools import setup, find_packages
-from Cython.Build import cythonize
+try:
+    from Cython.Build import cythonize
+    ext_modules = cythonize("wallpaper/*.pyx")
+except ImportError:
+    ext_modules = []
+
 
 setup(
     name='python-wallpaper',
-    version='0.2.2',
+    version='0.2.3',
     url='https://github.com/ondergetekende/python-wallpaper',
     description=(
         'python-wallpaper generates pseudorandom abstract wallpapers'
@@ -11,7 +16,7 @@ setup(
     author='Koert van der Veer',
     author_email='koert@ondergetekende.nl',
     packages=find_packages(),
-    ext_modules=cythonize("wallpaper/*.pyx"),
+    ext_modules=ext_modules,
     install_requires=["cython"],
     classifiers=[
         'Intended Audience :: Developers',
