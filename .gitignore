@@ -6,4 +6,4 @@ dist
 build
 
 wallpaper/_natives.c
-wallpaper/_natives.so
+wallpaper/_natives.*.so
