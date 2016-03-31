@@ -3,11 +3,11 @@ from . import geometry
 from . import color_scheme
 
 
-def get_svg_iter(width, height, params={}):
+def get_svg_iter(width, height, params={}, log_choices=False):
     # Pull the seed from the parameters.
     seed = params.pop("seed", None)
 
-    if params:
+    if params or log_choices:
         params = parameters.OverridableParameters(seed, params)
     else:
         params = parameters.RandomParameters(seed)
@@ -35,6 +35,10 @@ def get_svg_iter(width, height, params={}):
 
         yield '<path d="%s Z" fill="#%s" stroke="#%s"/>' % (path, color, color)
 
+    if log_choices:
+        for key, value in params.results.items():
+            yield '\n<!-- %s=%s -->' % (key, value)
+
     yield '</svg>'
 
 
@@ -52,6 +56,8 @@ def cmdline():
                         help='The height of the wallpaper')
     parser.add_argument('--seed',
                         help='Seed for the randomizer')
+    parser.add_argument('--log-choices',
+                        help='Log the choices made', action='store_true')
 
     parser.add_argument('--output', type=argparse.FileType('w'),
                         default='-')
@@ -59,5 +65,6 @@ def cmdline():
     args = parser.parse_args()
 
     for element in get_svg_iter(args.width, args.height,
-                                {"seed": args.seed}):
+                                {"seed": args.seed},
+                                log_choices=args.log_choices):
         args.output.write(element)
