@@ -92,9 +92,9 @@ class ColorNoise:
     def __init__(self, params, parent):
         self.parent = parent
 
-        hue = params.uniform("hue_variation", -.05, .05)
-        saturation = params.uniform("saturation_variation", -.2, .2)
-        value = params.uniform("value_variation", -.2, .2)
+        hue = params.uniform("hue_variation", 0, .05)
+        saturation = params.uniform("saturation_variation", 0, .2)
+        value = params.uniform("value_variation", 0, .5)
 
         base_scale = .1 * abs(params.size)
 
