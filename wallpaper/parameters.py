@@ -1,7 +1,7 @@
 import zlib
 import math
 import time
-import functools
+
 
 MAX_VALUE = 0x3FFFFFFF  # Ignore first two bits - they are insufficienly random
 INV_MAX_VALUE = 1.0 / MAX_VALUE
@@ -228,6 +228,12 @@ def _get_octave(seed, coord):
     return result * INV_MAX_VALUE
 
 
+try:
+    from ._natives import get_octave
+except ImportError:
+    get_octave = _get_octave
+
+
 class PerlinNoise():
     def __init__(self, seed, octaves=None, detail=None,
                  min_value=0, max_value=1, size=1.0):
@@ -252,7 +258,7 @@ class PerlinNoise():
 
     def __call__(self, coord):
         coord *= self.inv_size
-        value = sum(_get_octave(seed, coord * inv_scale) * scale
+        value = sum(get_octave(seed, coord * inv_scale) * scale
                     for (scale, inv_scale, seed) in self.octaves)
 
         # Interpolate between min and max value

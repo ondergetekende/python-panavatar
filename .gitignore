@@ -4,3 +4,6 @@ __pycache__/
 *.egg-info
 dist
 build
+
+wallpaper/_natives.c
+wallpaper/_natives.so

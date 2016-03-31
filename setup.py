@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-
+from Cython.Build import cythonize
 
 setup(
     name='python-wallpaper',
@@ -11,6 +11,7 @@ setup(
     author='Koert van der Veer',
     author_email='koert@ondergetekende.nl',
     packages=find_packages(),
+    ext_modules=cythonize("wallpaper/*.pyx"),
     install_requires=[],
     classifiers=[
         'Intended Audience :: Developers',
@@ -24,4 +25,3 @@ setup(
         ]
     },
 )
-
