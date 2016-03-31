@@ -182,8 +182,8 @@ class Brick(TilingPattern):
 
 class RoadBrick(TilingPattern):
     # roadwork bricks
-    brickh = [0, .5, 1, 1 + .5j, .5 + .5j, .5j]
-    brickv = [0, .5, .5 + .5j, .5 + 1j, 1j, .5j]
+    brickh = [0, 1, 2, 2 + 1j, 1 + 1j, 1j]
+    brickv = [0, 1, 1 + 1j, 1 + 2j, 2j, 1j]
 
     # aaEF
     # HbbF
@@ -191,14 +191,14 @@ class RoadBrick(TilingPattern):
     # dIEd
     pattern = [
         offset_shape(brickh, 0.0 + 0.0j),  # a
-        offset_shape(brickh, 0.5 + 0.5j),  # b
-        offset_shape(brickh, 1.0 + 1.0j),  # c
-        offset_shape(brickh, -0.5 - 0.5j),  # d
+        offset_shape(brickh, 1 + 1j),  # b
+        offset_shape(brickh, 2.0 + 2.0j),  # c
+        offset_shape(brickh, -1 - 1j),  # d
 
-        offset_shape(brickv, 0.0 + 0.5j),  # E
-        offset_shape(brickv, 0.5 - 1.0j),  # F
-        offset_shape(brickv, 1.0 - 0.5j),  # G
-        offset_shape(brickv, -0.5 + 0.0j),  # H
+        offset_shape(brickv, 0.0 + 1j),  # E
+        offset_shape(brickv, 1 - 2.0j),  # F
+        offset_shape(brickv, 2.0 - 1j),  # G
+        offset_shape(brickv, -1 + 0.0j),  # H
     ]
 
-    stride = 2 + 2j
+    stride = 4 + 4j
