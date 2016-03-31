@@ -3,7 +3,7 @@ from Cython.Build import cythonize
 
 setup(
     name='python-wallpaper',
-    version='0.2.1',
+    version='0.2.2',
     url='https://github.com/ondergetekende/python-wallpaper',
     description=(
         'python-wallpaper generates pseudorandom abstract wallpapers'
@@ -12,7 +12,7 @@ setup(
     author_email='koert@ondergetekende.nl',
     packages=find_packages(),
     ext_modules=cythonize("wallpaper/*.pyx"),
-    install_requires=[],
+    install_requires=["cython"],
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
