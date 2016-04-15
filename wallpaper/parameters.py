@@ -7,7 +7,7 @@ MAX_VALUE = 0x3FFFFFFF  # Ignore first two bits - they are insufficienly random
 INV_MAX_VALUE = 1.0 / MAX_VALUE
 
 
-class RandomParameters:
+class RandomParameters(object):
     """A source of all-random parameters.
     This class generates random numbers by computing hashes from keys.
     This is useful if some repeatable process needs multiple random numbers,
@@ -123,7 +123,7 @@ def wrap_float(name):
 class OverridableParameters(RandomParameters):
 
     def __init__(self, seed, overrides):
-        super().__init__(seed)
+        super(OverridableParameters, self).__init__(seed)
         self.values = overrides
         self.results = dict()
 
@@ -141,7 +141,8 @@ class OverridableParameters(RandomParameters):
             choice = self.values[key].lower()
         except KeyError:
             # override not set.
-            result = super().weighted_choice(probabilities, key)
+            result = super(OverridableParameters, self)\
+                .weighted_choice(probabilities, key)
             if hasattr(result, "__call__"):
                 self.results[key] = result.__name__
             else:
@@ -166,7 +167,7 @@ class OverridableParameters(RandomParameters):
 class RecordingParameters(RandomParameters):
 
     def __init__(self, seed, overrides):
-        super().__init__(seed)
+        super(RecordingParameters, self).__init__(seed)
         self.values = overrides
         self.results = dict()
 
@@ -181,7 +182,8 @@ class RecordingParameters(RandomParameters):
             choice = self.values[key].lower()
         except KeyError:
             # override not set.
-            return super().weighted_choice(probabilities, key)
+            return super(RecordingParameters, self)\
+                .weighted_choice(probabilities, key)
 
         # Find the matching key (case insensitive)
         for probability, option in probabilities:
@@ -239,8 +241,8 @@ class PerlinNoise():
                  min_value=0, max_value=1, size=1.0):
 
         if not octaves:
-            octaves = max(1, math.floor(math.log(size / detail, 2)))
-            print("size %s, detail %s, octaves %s" % (size, detail, octaves))
+            octaves = max(1, int(math.floor(math.log(size / detail, 2))))
+            # print("size %s, detail %s, octaves %r" % (size, detail, octaves))
 
         scales = [.5 ** o for o in range(octaves)]
         inv_total_scale = 1.0 / sum(scales)
@@ -252,9 +254,10 @@ class PerlinNoise():
         self.octaves = [
             (inv_total_scale * scale,
              1.0 / (inv_total_scale * scale),
-             seed ^ o * 541)
+             (seed ^ o * 541) & 0x3FFFFFFF)
             for (o, scale)
             in enumerate(scales)]
+        # print repr(self.octaves)
 
     def __call__(self, coord):
         coord *= self.inv_size

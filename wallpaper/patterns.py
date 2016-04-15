@@ -51,7 +51,7 @@ def get_tiles(params):
     return pattern(params).generate_tiles()
 
 
-class TilingPattern:
+class TilingPattern(object):
     stride = 1 + 1j
     colors = [0]
     is_sparse = False

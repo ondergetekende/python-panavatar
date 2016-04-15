@@ -6,7 +6,7 @@ def to_rgb(hsv):
 
     HSV should be in range 0..1, though hue wraps around. Output is a 
     hexadecimal color value as used by CSS, HTML and SVG"""
-    r, g, b = [min(255, max(0, component * 256))
+    r, g, b = [int(min(255, max(0, component * 256)))
                for component in colorsys.hsv_to_rgb(*hsv)]
 
     return "%02x%02x%02x" % (r, g, b)
