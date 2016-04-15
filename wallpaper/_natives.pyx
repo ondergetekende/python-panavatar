@@ -1,6 +1,10 @@
 import zlib
 import math
 
+cdef extern from "zlib.h":
+    unsigned long crc32(unsigned long crc, 
+                        const unsigned char *buf,
+                        unsigned int len)
 
 cdef unsigned long MAX_VALUE = 0x3FFFFFFF  # Ignore first two bits - they are insufficienly random
 cdef float INV_MAX_VALUE = 1.0 / float(MAX_VALUE)
@@ -9,7 +13,7 @@ cdef float INV_MAX_VALUE = 1.0 / float(MAX_VALUE)
 
 cdef float perlin_random(unsigned long seed, long  x,  long y):
     cdef unsigned long value
-    value = zlib.crc32(b"x", (seed ^ y) * x)
+    value = crc32((seed ^ y) * x, b"x", 1)
 
     value = value & MAX_VALUE
     return float(value)
