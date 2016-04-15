@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='python-wallpaper',
-    version='0.2.6',
+    version='0.2.7',
     url='https://github.com/ondergetekende/python-wallpaper',
     description=(
         'python-wallpaper generates pseudorandom abstract wallpapers'
