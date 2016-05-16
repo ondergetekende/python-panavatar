@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
-from wallpaper import cmdline
+from panavatar import cmdline
 cmdline()

@@ -22,15 +22,19 @@ def get_color_scheme(params):
 
     # Chose a spatial manipulation for the color.
     color_filter = params.weighted_choice([(10, 'noise'),
-                                           (5, 'noise_radial'),
-                                           (2, 'radial')],
+                                           (4, 'noise_vignette'),
+                                           (2, 'vignette'),
+                                           (1, 'radial_hue')],
                                           'color_filter')
 
     if "noise" in color_filter:
         the_scheme = ColorNoise(params, the_scheme)
 
-    if "radial" in color_filter:
+    if "vignette" in color_filter:
         the_scheme = RadialDarken(params, the_scheme)
+
+    if "radial_hue" in color_filter:
+        the_scheme = RadialHue(params, the_scheme)
 
     def sample(coord, scheme=0):
         return to_rgb(the_scheme.color_at(coord, scheme))
@@ -66,8 +70,7 @@ class Complement(BaseColorScheme):
 
         self.colors = [
             base_color,
-            (base_color[0] - .2, base_color[1], base_color[2]),
-            (base_color[0] + .2, base_color[1], base_color[2]),
+            (base_color[0] + .5, base_color[1], base_color[2]),
             (base_color[0], base_color[1], base_color[2] + .1),
             (base_color[0], base_color[1], base_color[2] - .1),
         ]
@@ -81,10 +84,10 @@ class Adjacent(BaseColorScheme):
 
         self.colors = [
             base_color,
-            (base_color[0] + .5, base_color[1], base_color[2]),
+            (base_color[0] - .2, base_color[1], base_color[2]),
+            (base_color[0] + .2, base_color[1], base_color[2]),
             (base_color[0], base_color[1], base_color[2] - .3),
             (base_color[0], base_color[1], base_color[2] + .1),
-            (base_color[0], base_color[1], base_color[2] - .1),
         ]
 
 
@@ -119,7 +122,7 @@ class RadialDarken:
         self.parent = parent
         self.params = params
 
-        self.edge_amount = params.uniform("radial_darkness", .2, .4)
+        self.edge_amount = params.uniform("radial_darkness", .2, .7)
 
     def color_at(self, coord, scheme):
         base_color = list(self.parent.color_at(coord, scheme))
@@ -131,3 +134,22 @@ class RadialDarken:
         return (base_color[0],
                 base_color[1],
                 base_color[2] * fade)
+
+
+class RadialHue:
+    def __init__(self, params, parent):
+        self.parent = parent
+        self.params = params
+
+        self.edge_amount = params.uniform("radial_darkness", .1, .5)
+
+    def color_at(self, coord, scheme):
+        base_color = list(self.parent.color_at(coord, scheme))
+        distance = 2 * \
+            abs(coord - (self.params.size / 2.0)) / abs(self.params.size)
+
+        fade = distance * self.edge_amount
+
+        return (base_color[0] + fade,
+                base_color[1],
+                base_color[2])

@@ -5,13 +5,13 @@ from . import patterns
 
 def get_geometry(params):
     deformations = []
-    if params.random('have_crumple') > .3:
+    if params.uniform('have_crumple') > .3:
         deformations.append(deform_crumple(params))
 
-    if params.random('have_wave') > .5:
+    if params.uniform('have_wave') > .5:
         deformations.append(deform_wave(params))
 
-    if params.random('have_zoom') > .5:
+    if params.uniform('have_zoom') > .5:
         deformations.append(deform_zoom(params))
 
     if deformations:

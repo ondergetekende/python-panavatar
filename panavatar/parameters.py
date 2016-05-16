@@ -58,6 +58,7 @@ class RandomParameters(object):
         return value * INV_MAX_VALUE
 
     def random(self, key):
+        print("GENERATING", key)
         return self._random(key)
 
     def uniform(self, key, min_value=0., max_value=1.):
@@ -106,6 +107,7 @@ class RandomParameters(object):
 def wrap_float(name):
     def wrapped(self, key, *args, **kwargs):
         try:
+            print(key, self.values)
             return float(self.values[key])
         except ValueError:
             pass  # Override was provided, but wasn't a float.

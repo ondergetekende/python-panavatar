@@ -49,7 +49,7 @@ def get_svg(width, height, params={}):
 def cmdline():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Generate an svg walpaper')
+    parser = argparse.ArgumentParser(description='Generate an svg wallpaper')
     parser.add_argument('--width', type=int, default=1024,
                         help='The width of the wallpaper')
     parser.add_argument('--height', type=int, default=786,

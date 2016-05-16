@@ -5,5 +5,5 @@ __pycache__/
 dist
 build
 
-wallpaper/_natives.c
-wallpaper/_natives.*.so
+panavatar/_natives.c
+panavatar/_natives.*.so
