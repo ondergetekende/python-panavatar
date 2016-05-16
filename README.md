@@ -13,10 +13,28 @@ Examples
 ![Example 3](https://raw.github.com/ondergetekende/python-panavatar/master/examples/example3.png)
 ![Example 4](https://raw.github.com/ondergetekende/python-panavatar/master/examples/example4.png)
 
-Installation
-===========
+Installation & usage
+====================
 
 Just use `pip install panavatar`.
+
+
+If you're using django, add this to your urls:
+
+```python
+from django.conf.urls import url
+
+import panavatar.djangoview
+
+urlpatterns = [
+    url(r'^bg/(?P<width>\d+)x(?P<height>\d+).svg$',
+        panavatar.djangoview.generate_image_svg, name='bg'),
+    url(r'^bg/(?P<width>\d+)x(?P<height>\d+)/(?P<seed>.+).svg$',
+        panavatar.djangoview.generate_image_svg, name='bg'),
+]
+```
+
+Outside of django you can use `panavatar.get_svg(width, height, parameters)` to get an SVG. Parameters is a dict with (optionally) the seed in a 'seed' member. The other paramaters are undocumented for now.
 
 About seeds
 ===========
