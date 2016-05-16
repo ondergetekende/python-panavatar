@@ -58,7 +58,6 @@ class RandomParameters(object):
         return value * INV_MAX_VALUE
 
     def random(self, key):
-        print("GENERATING", key)
         return self._random(key)
 
     def uniform(self, key, min_value=0., max_value=1.):
@@ -107,7 +106,6 @@ class RandomParameters(object):
 def wrap_float(name):
     def wrapped(self, key, *args, **kwargs):
         try:
-            print(key, self.values)
             return float(self.values[key])
         except ValueError:
             pass  # Override was provided, but wasn't a float.
@@ -244,7 +242,6 @@ class PerlinNoise():
 
         if not octaves:
             octaves = max(1, int(math.floor(math.log(size / detail, 2))))
-            # print("size %s, detail %s, octaves %r" % (size, detail, octaves))
 
         scales = [.5 ** o for o in range(octaves)]
         inv_total_scale = 1.0 / sum(scales)
@@ -259,7 +256,6 @@ class PerlinNoise():
              (seed ^ o * 541) & 0x3FFFFFFF)
             for (o, scale)
             in enumerate(scales)]
-        # print repr(self.octaves)
 
     def __call__(self, coord):
         coord *= self.inv_size

@@ -23,7 +23,7 @@ def never_modified(request, width, height, seed=None):
     return datetime.datetime.now()
 
 
-#@condition(last_modified_func=never_modified)
+@condition(last_modified_func=never_modified)
 def generate_image_svg(request, width, height, seed=None):
     width = int(width)
     height = int(height)
