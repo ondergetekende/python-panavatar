@@ -1,18 +1,22 @@
+import os
 from setuptools import setup
 from distutils.extension import Extension
 
 
-try:
-    from Cython.Build import cythonize
-    ext_modules = cythonize("panavatar/_natives.pyx")
-except ImportError:
-    ext_modules = [
-        Extension("panavatar._natives", ["panavatar/_natives.c"]),
-    ]
+ext_modules = [
+    Extension("panavatar._natives", ["panavatar/_natives.c"]),
+]
+
+if os.path.exists("panavatar/_natives.pyx"):
+    try:
+        from Cython.Build import cythonize
+        ext_modules = cythonize("panavatar/_natives.pyx")
+    except ImportError:
+        pass
 
 setup(
     name='panavatar',
-    version='0.3.0',
+    version='0.3.2',
     url='https://github.com/ondergetekende/python-panavatar',
     description=(
         'Panavatar generates pseudorandom abstract wallpapers'
