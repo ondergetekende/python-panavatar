@@ -16,7 +16,7 @@ if os.path.exists("panavatar/_natives.pyx"):
 
 setup(
     name='panavatar',
-    version='0.3.2',
+    version='0.3.3',
     url='https://github.com/ondergetekende/python-panavatar',
     description=(
         'Panavatar generates pseudorandom abstract wallpapers'
