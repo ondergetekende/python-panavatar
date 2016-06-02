@@ -1,7 +1,6 @@
 from . import parameters
 from . import geometry
 from . import color_scheme
-from . import urls
 
 
 def get_svg_iter(width, height, params={}, log_choices=False):
