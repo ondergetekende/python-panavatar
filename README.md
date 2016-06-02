@@ -22,19 +22,27 @@ Just use `pip install panavatar`.
 If you're using django, add this to your urls:
 
 ```python
-from django.conf.urls import url
-
-import panavatar.djangoview
+import panavatar
 
 urlpatterns = [
-    url(r'^bg/(?P<width>\d+)x(?P<height>\d+).svg$',
-        panavatar.djangoview.generate_image_svg, name='bg'),
-    url(r'^bg/(?P<width>\d+)x(?P<height>\d+)/(?P<seed>.+).svg$',
-        panavatar.djangoview.generate_image_svg, name='bg'),
+    url(r'^panavatar/', include("panavatar.urls")),
 ]
 ```
 
+This will add two urls to your website : `yourdomain/panavatar/<width>x<height>.svg` and `yourdomain/panavatar/<width>x<height>/<seed>.svg`.
+
 Outside of django you can use `panavatar.get_svg(width, height, parameters)` to get an SVG. Parameters is a dict with (optionally) the seed in a 'seed' member. The other paramaters are undocumented for now.
+
+In Django Templates
+===================
+
+In your template you can call these urls with : `{% url 'bg' width=1920 height=300 %}` or `{% url 'bg' width=1920 height=300 seed="myseed" %}`
+
+And for example you can use it with inline styling like this :
+
+```html
+<div style="background-image: url({% url 'bg' width=1920 height=300 seed="myseed" %})"
+```
 
 About seeds
 ===========
