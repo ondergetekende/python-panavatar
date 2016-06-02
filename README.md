@@ -36,9 +36,13 @@ Outside of django you can use `panavatar.get_svg(width, height, parameters)` to 
 In Django Templates
 ===================
 
-In your template you can call these urls with : `{% url 'bg' width=1920 height=300 %}` or `{% url 'bg' width=1920 height=300 seed="myseed" %}`
+In your template you can call these urls with : `{% url 'bg' width=1920 height=300 %}` or `{% url 'bg_seed' width=1920 height=300 seed="myseed" %}`
 
-And for example you can use with inline styling like this : `<div style="background-image: url({% url 'bg_seed' width=1920 height=300 seed="myseed" %})"`
+And for example you can use it with inline styling like this :
+
+```html
+<div style="background-image: url({% url 'bg_seed' width=1920 height=300 seed="myseed" %})"
+```
 
 About seeds
 ===========
